@@ -12,6 +12,7 @@ export class PimPage {
         this.employeeIdInputField = "//label[normalize-space()='Employee Id']/following::input[1]";
         this.saveButton = "//button[normalize-space()='Save']";
         this.personalDetailsText = "//h6[normalize-space()='Personal Details']";
+        this.employeeListText = "//a[normalize-space()='Employee List']"
     };
 
     async addEmployeeButtonClick(){
@@ -19,12 +20,8 @@ export class PimPage {
         await expect(this.page.locator(this.addEmployeeText)).toBeVisible();
     }
 
-    async addEmployee(firstName, middleName, lastName, employeeId){
-        await this.page.fill(this.firstNameInputField, firstName);
-        await this.page.fill(this.middleNameInputField, middleName);
-        await this.page.fill(this.lastNameInputField, lastName);
-        await this.page.fill(this.employeeIdInputField, employeeId);
-        await this.page.click(this.saveButton);
-        await expect(this.page.locator(this.personalDetailsText)).toBeVisible({timeout: 25000});
-    } 
+    async employeeListButtonClick(){
+        await this.page.click(this.employeeListText);
+        // expect(this.page.locator(this.pimText)).toBeVisible();
+    }
 };

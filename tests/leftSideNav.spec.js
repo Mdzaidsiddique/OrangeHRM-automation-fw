@@ -1,14 +1,17 @@
 import {test, expect} from '@playwright/test';
 import {LeftSideNav} from '../pages/LeftSideNav';
 import {LoginPage} from '../pages/LoginPage';
-import credentials from '../test-data/credentials.json';
 import { log } from 'console';
+import fs from 'fs';
+
+const ENV = process.env.ENV || 'qa';
+const envData = JSON.parse(fs.readFileSync(`./config/${ENV}.json`));
 
 test.describe("Left side navigation tests", ()=>{
     test.beforeEach("login", async ({page})=>{
         const loginPage = new LoginPage(page);
         await loginPage.pagelaunch("https://opensource-demo.orangehrmlive.com");
-        await loginPage.login(credentials.username, credentials.password);
+        await loginPage.login(envData.username, envData.password);
     });
 
     test("search and navigate to Admin option", async ({page})=>{

@@ -6,12 +6,16 @@ import employeeData from '../test-data/employeeData.json';
 import { LeftSideNav } from '../pages/LeftSideNav';
 import { log } from 'console';
 import { PimPage } from '../pages/PimPage';
+import fs from 'fs';
+
+const ENV = process.env.ENV || 'qa';
+const envData = JSON.parse(fs.readFileSync(`./config/${ENV}.json`));
 
 test.describe("Add Employee tests", ()=>{
     test.beforeEach("login", async ({page})=>{
         const loginPage = new LoginPage(page);
         await loginPage.pagelaunch("https://opensource-demo.orangehrmlive.com");
-        await loginPage.login(credentials.username, credentials.password);
+        await loginPage.login(envData.username, envData.password);
     });
 
     test("add employee", async ({page})=>{
