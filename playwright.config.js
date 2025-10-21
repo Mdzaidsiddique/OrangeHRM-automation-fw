@@ -17,7 +17,11 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined, // Run single worker on CI for stability
 
 // Reporters
-  reporter: 'html',//[['line'],['allure-playwright']],
+  // reporter: 'html',[['line'],['allure-playwright']],
+  reporter: [
+    ['list'], // simple console reporter
+    ['allure-playwright'], // allure reporter
+  ],
 
   // Shared Test Settings
   use: {
