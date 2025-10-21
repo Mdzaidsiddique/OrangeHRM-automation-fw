@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "Node22"
+        nodejs "Node22" 
     }
 
     parameters {
@@ -29,23 +29,21 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo "Installing npm dependencies..."
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                echo "Running Playwright tests on ${ENV} environment"
-                // Run with Allure reporter
-                sh "npx playwright test --env=${ENV} --reporter=line,allure-playwright"
+                echo "Running Playwright tests on ${ENV} environment..."
+                bat "npx playwright test --env=${ENV} --reporter=line,allure-playwright"
             }
         }
 
         stage('Generate Allure Report') {
             steps {
                 echo "Generating Allure report..."
-                // Generate allure-report folder from allure-results
-                sh 'npx allure generate allure-results --clean -o allure-report'
+                bat 'npx allure generate allure-results --clean -o allure-report'
             }
         }
 
@@ -55,7 +53,8 @@ pipeline {
                 allure([
                     includeProperties: false,
                     jdk: '',
-                    results: [[path: 'allure-results']]
+                    results: [[path: 'allure-results']],
+                    reportBuildPolicy: 'ALWAYS'
                 ])
             }
         }
@@ -68,11 +67,11 @@ pipeline {
         }
 
         success {
-            echo "Playwright + Allure tests ran successfully on ${ENV}"
+            echo "Playwright + Allure tests executed successfully on ${ENV}!"
         }
 
         failure {
-            echo "Tests failed! Check the Allure report for details."
+            echo "Tests failed! Check the Allure report for detailed logs."
         }
     }
 }
