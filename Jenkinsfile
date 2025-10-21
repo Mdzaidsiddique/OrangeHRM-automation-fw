@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "Node22"  // must match the NodeJS name configured in Jenkins (Manage Jenkins → Global Tool Configuration)
+        nodejs "Node22"
     }
 
     environment {
@@ -39,15 +39,15 @@ pipeline {
             }
         }
 
-        stage('Publish HTML Report') {
-            steps {
-                publishHTML([
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report'
-                ])
-            }
-        }
+        // stage('Publish HTML Report') {
+        //     steps {
+        //         publishHTML([
+        //             reportDir: 'playwright-report',
+        //             reportFiles: 'index.html',
+        //             reportName: 'Playwright Test Report'
+        //         ])
+        //     }
+        // }
     }
 
     post {
