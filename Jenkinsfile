@@ -36,9 +36,10 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo "Running Playwright tests on ${ENV} environment..."
-                bat "npx playwright test --env=${ENV} --reporter=line,allure-playwright"
+                bat "set ENV=${ENV} && npx playwright test --reporter=line,allure-playwright"
             }
         }
+
 
         stage('Generate Allure Report') {
             steps {
