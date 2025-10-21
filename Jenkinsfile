@@ -5,10 +5,6 @@ pipeline {
         nodejs "Node22"
     }
 
-    environment {
-        ENV = "${params.ENVIRONMENT ?: 'qa'}"
-    }
-
     parameters {
         choice(
             name: 'ENVIRONMENT',
@@ -17,10 +13,15 @@ pipeline {
         )
     }
 
+    environment {
+        ENV = "${params.ENVIRONMENT ?: 'qa'}"
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
+                echo "Checking out code from GitHub..."
                 git branch: 'master', url: 'https://github.com/Mdzaidsiddique/OrangeHRM-automation-fw.git'
             }
         }
@@ -28,32 +29,50 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo "Installing npm dependencies..."
-                bat 'npm install'
+                sh 'npm install'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
                 echo "Running Playwright tests on ${ENV} environment"
-                bat "npx playwright test --env=${ENV} --reporter=html"
+                sh "npx playwright test --env=${ENV} --reporter=allure-playwright"
             }
         }
 
-        // stage('Publish HTML Report') {
-        //     steps {
-        //         publishHTML([
-        //             reportDir: 'playwright-report',
-        //             reportFiles: 'index.html',
-        //             reportName: 'Playwright Test Report'
-        //         ])
-        //     }
-        // }
+        stage('Generate Allure Report') {
+            steps {
+                echo "Generating Allure report..."
+                sh 'npx allure generate allure-results --clean -o allure-report'
+            }
+        }
+
+        stage('Publish Allure Report') {
+            steps {
+                echo "Publishing Allure HTML report..."
+                publishHTML([
+                    reportDir: 'allure-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Allure Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true
+                ])
+            }
+        }
     }
 
     post {
         always {
             echo "Cleaning workspace..."
             cleanWs()
+        }
+
+        success {
+            echo "Pipeline completed successfully!"
+        }
+
+        failure {
+            echo "Pipeline failed. Check logs and report."
         }
     }
 }

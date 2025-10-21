@@ -2,22 +2,20 @@ import { defineConfig, devices } from '@playwright/test';
 import fs from 'fs';
 
 // Environment Configuration
-const ENV = process.env.ENV || 'qa'; // default: QA
-const configFile = `./config/${ENV}.json`;
-const envConfig = JSON.parse(fs.readFileSync(configFile));
+const env = process.env.ENV || 'qa';
+const configFilePath = `./config/${env}.json`;
+if (!fs.existsSync(configFilePath)) {
+  throw new Error(`Config file not found for environment: ${env}`);
+}
+const envConfig = JSON.parse(fs.readFileSync(configFilePath, 'utf-8'));
 
 // Playwright Test Configuration
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
 
- // CI Configuration
-  forbidOnly: !!process.env.CI,          // Fail build if test.only is left in code
-  retries: process.env.CI ? 2 : 0,       // Retry failed tests on CI
-  workers: process.env.CI ? 1 : undefined, // Run single worker on CI for stability
 
 // Reporters
-  // reporter: 'html',[['line'],['allure-playwright']],
   reporter: [
     ['list'], // simple console reporter
     ['allure-playwright'], // allure reporter
@@ -26,6 +24,10 @@ export default defineConfig({
   // Shared Test Settings
   use: {
     baseURL: envConfig.baseURL,
+    extraHTTPHeaders: {
+      username: envConfig.username,
+      password: envConfig.password
+    },
     headless: true,               // Set to true for CI
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

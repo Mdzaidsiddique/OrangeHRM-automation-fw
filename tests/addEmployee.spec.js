@@ -1,7 +1,6 @@
 import {test, expect} from '@playwright/test';
 import {LoginPage} from '../pages/LoginPage';
 import {AddEmployeePage} from '../pages/addEmployeePage';
-import credentials from '../test-data/credentials.json';
 import employeeData from '../test-data/employeeData.json';
 import { LeftSideNav } from '../pages/LeftSideNav';
 import { log } from 'console';
@@ -14,7 +13,7 @@ const envData = JSON.parse(fs.readFileSync(`./config/${ENV}.json`));
 test.describe("Add Employee tests", ()=>{
     test.beforeEach("login", async ({page})=>{
         const loginPage = new LoginPage(page);
-        await loginPage.pagelaunch("https://opensource-demo.orangehrmlive.com");
+        await loginPage.pagelaunch(envData.baseURL);
         await loginPage.login(envData.username, envData.password);
     });
 

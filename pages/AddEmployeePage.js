@@ -19,6 +19,6 @@ export class AddEmployeePage {
         await this.page.fill(this.lastNameInputField, lastName);
         await this.page.fill(this.employeeIdInputField, employeeId+1);
         await this.page.click(this.saveButton);
-        await expect(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({timeout: 10000});
+        await expect.soft(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({timeout: 10000});
     } 
 };
