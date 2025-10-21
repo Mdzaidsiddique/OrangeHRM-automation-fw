@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "test": "npx playwright test",
     "test:general": "npx playwright test --headed --project=chromium",
     "test:qa": "npx playwright test --env=qa",
     "test:staging": "npx playwright test --env=staging",
     "test:prod": "npx playwright test --env=prod",
-    "report": "npx playwright show-report"
+    "test:report": "npx playwright show-report"
   },
   "keywords": [],
   "author": "",

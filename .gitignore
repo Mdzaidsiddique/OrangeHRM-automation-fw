@@ -1,8 +1,64 @@
-
-# Playwright
+# Dependencies
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+
+# Playwright reports and results
+playwright-report/
+test-results/
+screenshots/
+blob-report/
+trace.zip
+*.trace.zip
+*.webm
+*.mp4
+*.png
+*.zip
+
+# Allure results (if you integrate with Allure)
+allure-results/
+allure-report/
+
+# Logs and debug output
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage (if using Istanbul/nyc)
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS / IDE / Editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Cache / temporary files
+.cache/
+.tmp/
+*.tmp
+*.bak
+*.orig
+
+# Jenkins or build output
+dist/
+build/
+reports/
+target/
+html-report/
+junit.xml
+
+# Playwright internal browser cache
+.playwright/
+.pnpm-store/
+.npm/
+.yarn/
+
+misc/
