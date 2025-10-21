@@ -1,78 +1,71 @@
 pipeline {
-    agent any
+  agent any
 
-    tools {
-        nodejs "Node22" 
+  // 👇 Add a parameter for choosing the environment
+  parameters {
+    choice(
+      name: 'ENV',
+      choices: ['qa', 'staging', 'prod'],
+      description: 'Select the environment to run Playwright tests on'
+    )
+  }
+
+  environment {
+    // 👇 Make ENV globally available to Node.js (Playwright)
+    ENV = "${params.ENV}"
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
     }
 
-    parameters {
-        choice(
-            name: 'ENVIRONMENT',
-            choices: ['qa', 'staging', 'prod'],
-            description: 'Select environment to run Playwright tests'
-        )
+    stage('Install Dependencies') {
+      steps {
+        echo '📦 Installing project dependencies...'
+        bat 'npm ci'
+      }
     }
 
-    environment {
-        ENV = "${params.ENVIRONMENT ?: 'qa'}"
+    stage('Run Playwright Tests') {
+      steps {
+        echo "🎭 Running Playwright tests on '${ENV}' environment..."
+        bat "npx playwright test --reporter=line,allure-playwright"
+      }
     }
 
-    stages {
-
-        stage('Checkout') {
-            steps {
-                echo "Checking out code from GitHub..."
-                git branch: 'master', url: 'https://github.com/Mdzaidsiddique/OrangeHRM-automation-fw.git'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                echo "Installing npm dependencies..."
-                bat 'npm install'
-            }
-        }
-
-        stage('Run Playwright Tests') {
-            steps {
-                echo "Running Playwright tests on ${ENV} environment..."
-                bat "set ENV=${ENV} && npx playwright test --reporter=line,allure-playwright"
-            }
-        }
-
-
-        stage('Generate Allure Report') {
-            steps {
-                echo "Generating Allure report..."
-                bat 'npx allure generate allure-results --clean -o allure-report'
-            }
-        }
-
-        stage('Publish Allure Report') {
-            steps {
-                echo "Publishing Allure report to Jenkins dashboard..."
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'allure-results']],
-                    reportBuildPolicy: 'ALWAYS'
-                ])
-            }
-        }
+    stage('Generate Allure Report') {
+      steps {
+        echo '🧩 Generating Allure report...'
+        bat 'npx allure generate allure-results --clean -o allure-report'
+      }
     }
 
-    post {
-        always {
-            echo "Cleaning workspace..."
-            cleanWs()
-        }
-
-        success {
-            echo "Playwright + Allure tests executed successfully on ${ENV}!"
-        }
-
-        failure {
-            echo "Tests failed! Check the Allure report for detailed logs."
-        }
+    stage('Publish Allure Report') {
+      steps {
+        echo '📊 Publishing Allure report in Jenkins...'
+        allure([
+          includeProperties: false,
+          jdk: '',
+          results: [[path: 'allure-results']]
+        ])
+      }
     }
+  }
+
+  post {
+    always {
+      echo '🧹 Cleaning workspace after build...'
+      cleanWs()
+    }
+    failure {
+      echo '❌ Build failed. Check Allure report for test details.'
+    }
+    success {
+      echo '✅ Build and tests completed successfully!'
+    }
+  }
 }
