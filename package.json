@@ -2,13 +2,20 @@
   "name": "orangehrm-automation-fw",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:general": "npx playwright test --headed --project=chromium",
+    "test:qa": "npx playwright test --env=qa",
+    "test:staging": "npx playwright test --env=staging",
+    "test:prod": "npx playwright test --env=prod",
+    "report": "npx playwright show-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.56.0",
-    "@types/node": "^24.7.2"
+    "@types/node": "^24.7.2",
+    "allure-playwright": "^3.4.1"
   }
 }
