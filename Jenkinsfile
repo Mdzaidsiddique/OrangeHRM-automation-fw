@@ -9,7 +9,7 @@ pipeline {
         choice(
             name: 'ENVIRONMENT',
             choices: ['qa', 'staging', 'prod'],
-            description: 'Select environment to run tests'
+            description: 'Select environment to run Playwright tests'
         )
     }
 
@@ -36,26 +36,26 @@ pipeline {
         stage('Run Playwright Tests') {
             steps {
                 echo "Running Playwright tests on ${ENV} environment"
-                sh "npx playwright test --env=${ENV} --reporter=allure-playwright"
+                // Run with Allure reporter
+                sh "npx playwright test --env=${ENV} --reporter=line,allure-playwright"
             }
         }
 
         stage('Generate Allure Report') {
             steps {
                 echo "Generating Allure report..."
+                // Generate allure-report folder from allure-results
                 sh 'npx allure generate allure-results --clean -o allure-report'
             }
         }
 
         stage('Publish Allure Report') {
             steps {
-                echo "Publishing Allure HTML report..."
-                publishHTML([
-                    reportDir: 'allure-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Allure Report',
-                    keepAll: true,
-                    alwaysLinkToLastBuild: true
+                echo "Publishing Allure report to Jenkins dashboard..."
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'allure-results']]
                 ])
             }
         }
@@ -68,11 +68,11 @@ pipeline {
         }
 
         success {
-            echo "Pipeline completed successfully!"
+            echo "Playwright + Allure tests ran successfully on ${ENV}"
         }
 
         failure {
-            echo "Pipeline failed. Check logs and report."
+            echo "Tests failed! Check the Allure report for details."
         }
     }
 }
