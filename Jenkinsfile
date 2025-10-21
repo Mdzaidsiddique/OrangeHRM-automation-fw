@@ -7,16 +7,10 @@ pipeline {
       choices: ['qa', 'staging', 'prod'],
       description: 'Select environment to run Playwright tests on'
     )
-    choice(
-      name: 'BROWSER',
-      choices: ['chromium', 'firefox', 'webkit'],
-      description: 'Select browser to run Playwright tests on'
-    )
   }
 
   environment {
     ENV = "${params.ENV}"
-    BROWSER = "${params.BROWSER}"
   }
 
   stages {
@@ -28,39 +22,35 @@ pipeline {
 
     stage('Install Dependencies') {
       steps {
-        echo '📦 Installing npm dependencies...'
+        echo '📦 Installing project dependencies...'
         bat 'npm ci'
       }
     }
 
     stage('Install Playwright Browsers') {
       steps {
-        echo '🎯 Installing Playwright browsers if missing...'
+        echo '🎯 Installing Playwright browsers...'
         bat 'npx playwright install --with-deps'
       }
     }
 
     stage('Run Playwright Tests') {
       steps {
-        script {
-          echo "🎭 Running Playwright tests on '${ENV}' using '${BROWSER}'..."
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat "set ENV=${ENV} && npx playwright test --project=${BROWSER} --reporter=line,allure-playwright"
-          }
-        }
+        echo "🎭 Running Playwright tests on '${ENV}' environment..."
+        bat "npx playwright test --browser=chromium --reporter=line,allure-playwright"
       }
     }
 
     stage('Generate Allure Report') {
       steps {
         echo '🧩 Generating Allure report...'
-        bat 'npx allure generate allure-results --clean -o allure-report || echo "No Allure results to generate."'
+        bat 'npx allure generate allure-results --clean -o allure-report'
       }
     }
 
     stage('Publish Allure Report') {
       steps {
-        echo '📊 Publishing Allure report...'
+        echo '📊 Publishing Allure report in Jenkins...'
         allure([
           includeProperties: false,
           jdk: '',
@@ -72,14 +62,14 @@ pipeline {
 
   post {
     always {
-      echo '🧹 Cleaning workspace after build...'
+      echo '🧹 Cleaning worZkspace after build...'
       cleanWs()
     }
     failure {
-      echo '❌ Tests failed. Allure report generated for debugging.'
+      echo '❌ Build failed. Check Allure report for test details.'
     }
     success {
-      echo '✅ All tests passed successfully!'
+      echo '✅ Build and tests completed successfully!'
     }
   }
 }
