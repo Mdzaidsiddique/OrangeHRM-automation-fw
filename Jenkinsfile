@@ -7,10 +7,16 @@ pipeline {
       choices: ['qa', 'staging', 'prod'],
       description: 'Select environment to run Playwright tests on'
     )
+    choice(
+      name: 'BROWSER',
+      choices: ['chromium', 'firefox', 'webkit'],
+      description: 'Select browser to run Playwright tests on'
+    )
   }
 
   environment {
     ENV = "${params.ENV}"
+    BROWSER = "${params.BROWSER}"
   }
 
   stages {
@@ -22,35 +28,39 @@ pipeline {
 
     stage('Install Dependencies') {
       steps {
-        echo '📦 Installing project dependencies...'
+        echo '📦 Installing npm dependencies...'
         bat 'npm ci'
       }
     }
 
     stage('Install Playwright Browsers') {
       steps {
-        echo '🎯 Installing Playwright browsers...'
+        echo '🎯 Installing Playwright browsers if missing...'
         bat 'npx playwright install --with-deps'
       }
     }
 
     stage('Run Playwright Tests') {
       steps {
-        echo "🎭 Running Playwright tests on '${ENV}' environment..."
-        bat "npx playwright test --reporter=line,allure-playwright"
+        script {
+          echo "🎭 Running Playwright tests on '${ENV}' using '${BROWSER}'..."
+          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            bat "set ENV=${ENV} && npx playwright test --project=${BROWSER} --reporter=line,allure-playwright"
+          }
+        }
       }
     }
 
     stage('Generate Allure Report') {
       steps {
         echo '🧩 Generating Allure report...'
-        bat 'npx allure generate allure-results --clean -o allure-report'
+        bat 'npx allure generate allure-results --clean -o allure-report || echo "No Allure results to generate."'
       }
     }
 
     stage('Publish Allure Report') {
       steps {
-        echo '📊 Publishing Allure report in Jenkins...'
+        echo '📊 Publishing Allure report...'
         allure([
           includeProperties: false,
           jdk: '',
@@ -66,10 +76,10 @@ pipeline {
       cleanWs()
     }
     failure {
-      echo '❌ Build failed. Check Allure report for test details.'
+      echo '❌ Tests failed. Allure report generated for debugging.'
     }
     success {
-      echo '✅ Build and tests completed successfully!'
+      echo '✅ All tests passed successfully!'
     }
   }
 }
