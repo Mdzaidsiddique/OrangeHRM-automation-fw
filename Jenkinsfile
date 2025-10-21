@@ -1,22 +1,19 @@
 pipeline {
   agent any
 
-  // 👇 Add a parameter for choosing the environment
   parameters {
     choice(
       name: 'ENV',
       choices: ['qa', 'staging', 'prod'],
-      description: 'Select the environment to run Playwright tests on'
+      description: 'Select environment to run Playwright tests on'
     )
   }
 
   environment {
-    // 👇 Make ENV globally available to Node.js (Playwright)
     ENV = "${params.ENV}"
   }
 
   stages {
-
     stage('Checkout') {
       steps {
         checkout scm
@@ -27,6 +24,13 @@ pipeline {
       steps {
         echo '📦 Installing project dependencies...'
         bat 'npm ci'
+      }
+    }
+
+    stage('Install Playwright Browsers') {
+      steps {
+        echo '🎯 Installing Playwright browsers...'
+        bat 'npx playwright install --with-deps'
       }
     }
 
