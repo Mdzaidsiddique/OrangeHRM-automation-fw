@@ -19,12 +19,6 @@ pipeline {
     )
   }
 
-  environment {
-    ENV = "${params.ENV}"
-    BROWSER = "${params.BROWSER}"
-    TAGS = "${params.TAGS}"
-  }
-
   stages {
     stage('Checkout') {
       steps {
@@ -50,14 +44,17 @@ pipeline {
     stage('Run Playwright Tests') {
       steps {
         script {
-          echo "🎭 Running Playwright tests on '${ENV}' using '${BROWSER}' browser..."
+          def envValue = params.ENV
+          def browserValue = params.BROWSER
+          def tagsValue = params.TAGS?.trim()
+
+          echo "🎭 Running Playwright tests on '${envValue}' using '${browserValue}' browser..."
           
-          def tagOption = TAGS?.trim() ? "--grep ${TAGS}" : ""
-          
-          // Using set to persist ENV variable in Windows bat context
+          def tagOption = tagsValue ? "--grep ${tagsValue}" : ""
+
           bat """
-            set ENV=${ENV}
-            npx playwright test --project=${BROWSER} ${tagOption} --reporter=line,allure-playwright
+            set ENV=${envValue}
+            npx playwright test --project=${browserValue} ${tagOption} --reporter=line,allure-playwright
           """
         }
       }
