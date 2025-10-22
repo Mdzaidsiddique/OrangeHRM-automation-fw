@@ -7,22 +7,35 @@ pipeline {
       choices: ['qa', 'staging', 'prod'],
       description: 'Select environment to run Playwright tests on'
     )
+    choice(
+      name: 'BROWSER',
+      choices: ['chromium', 'firefox', 'webkit'],
+      description: 'Select browser to run Playwright tests on'
+    )
+    string(
+      name: 'TAGS',
+      defaultValue: '',
+      description: 'Run tests by tag (e.g. @smoke or @regression). Leave blank to run all tests.'
+    )
   }
 
   environment {
     ENV = "${params.ENV}"
+    BROWSER = "${params.BROWSER}"
+    TAGS = "${params.TAGS}"
   }
 
   stages {
     stage('Checkout') {
       steps {
+        echo '📦 Checking out source code...'
         checkout scm
       }
     }
 
     stage('Install Dependencies') {
       steps {
-        echo '📦 Installing project dependencies...'
+        echo '📦 Installing npm dependencies...'
         bat 'npm ci'
       }
     }
@@ -36,8 +49,17 @@ pipeline {
 
     stage('Run Playwright Tests') {
       steps {
-        echo "🎭 Running Playwright tests on '${ENV}' environment..."
-        bat "npx playwright test --browser=chromium --reporter=line,allure-playwright"
+        script {
+          echo "🎭 Running Playwright tests on '${ENV}' using '${BROWSER}' browser..."
+          
+          def tagOption = TAGS?.trim() ? "--grep ${TAGS}" : ""
+          
+          // Using set to persist ENV variable in Windows bat context
+          bat """
+            set ENV=${ENV}
+            npx playwright test --project=${BROWSER} ${tagOption} --reporter=line,allure-playwright
+          """
+        }
       }
     }
 
@@ -62,11 +84,11 @@ pipeline {
 
   post {
     always {
-      echo '🧹 Cleaning worZkspace after build...'
+      echo '🧹 Cleaning workspace after build...'
       cleanWs()
     }
     failure {
-      echo '❌ Build failed. Check Allure report for test details.'
+      echo '❌ Build failed. Check Allure report for details.'
     }
     success {
       echo '✅ Build and tests completed successfully!'
