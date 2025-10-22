@@ -1,13 +1,14 @@
-import {test} from '@playwright/test';
-import {LoginPage} from '../pages/LoginPage';
+import { test } from '../fixtures/fixtures.js';
+import { LoginPage } from '../pages/LoginPage.js';
+import logger from '../utils/Logger.js';
 
-test("test login scenario", async ({page})=>{
-    const loginPage = new LoginPage(page);
+test('@sanity Verify login works', async ({ page }) => {
+  const { username, password } = test.info().project.use.extraHTTPHeaders;
+  const baseURL = test.info().project.use.baseURL;
 
-    // Get values from global config
-    const { username, password } = test.info().project.use.extraHTTPHeaders;
-    const baseURL = test.info().project.use.baseURL;
+  const loginPage = new LoginPage(page);
+  await loginPage.pagelaunch(baseURL);
+  await loginPage.login(username, password);
 
-    await loginPage.pagelaunch(baseURL);
-    await loginPage.login(username, password);
+  logger.info('Login test completed successfully');
 });

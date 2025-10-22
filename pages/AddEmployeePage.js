@@ -1,24 +1,24 @@
-import { expect } from "@playwright/test";
+import { BasePage } from './BasePage.js';
+import { expect } from '@playwright/test';
 
-export class AddEmployeePage {
-    constructor(page){
-        this.page = page;
-        // this.imageUpload = "//input[@type='file']";
-        this.firstNameInputField = "//input[@name='firstName']";
-        this.middleNameInputField = "//input[@name='middleName']";
-        this.lastNameInputField = "//input[@name='lastName']";
-        this.employeeIdInputField = "//label[normalize-space()='Employee Id']/following::input[1]";
-        // this.create login detils toggle button
-        this.saveButton = "//button[normalize-space()='Save']";
-        // this.userNameHeadingOnEmpListPage = "//h6[normalize-space()='{firstName} {middleName} {lastName}']";
-    };
+export class AddEmployeePage extends BasePage {
+  constructor(page) {
+    super(page);
+    this.firstNameInputField = "//input[@name='firstName']";
+    this.middleNameInputField = "//input[@name='middleName']";
+    this.lastNameInputField = "//input[@name='lastName']";
+    this.employeeIdInputField = "//label[normalize-space()='Employee Id']/following::input[1]";
+    this.saveButton = "//button[normalize-space()='Save']";
+  }
 
-    async addEmployee(firstName, middleName, lastName, employeeId){
-        await this.page.fill(this.firstNameInputField, firstName);
-        await this.page.fill(this.middleNameInputField, middleName);
-        await this.page.fill(this.lastNameInputField, lastName);
-        await this.page.fill(this.employeeIdInputField, employeeId+1);
-        await this.page.click(this.saveButton);
-        await expect.soft(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({timeout: 10000});
-    } 
-};
+  async addEmployee(firstName, middleName, lastName, employeeId) {
+    await this.fill(this.firstNameInputField, firstName, 'First Name');
+    await this.fill(this.middleNameInputField, middleName, 'Middle Name');
+    await this.fill(this.lastNameInputField, lastName, 'Last Name');
+    await this.fill(this.employeeIdInputField, employeeId + 10, 'Employee ID');
+    await this.click(this.saveButton, 'Save Button');
+    await this.page.waitForLoadState('networkidle'); // wait until page/network settles
+    await this.page.waitForTimeout(1000); // small optional wait if UI animation exists
+    await expect.soft(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({ timeout: 10000 });
+  }
+}

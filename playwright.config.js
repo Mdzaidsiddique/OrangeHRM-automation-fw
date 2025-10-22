@@ -17,8 +17,8 @@ export default defineConfig({
 
 // Reporters
   reporter: [
-    ['list'], // simple console reporter
-    ['allure-playwright'], // allure reporter
+    ['list'],
+    ['allure-playwright'],
   ],
 
   // Shared Test Settings
@@ -28,12 +28,13 @@ export default defineConfig({
       username: envConfig.username,
       password: envConfig.password
     },
-    headless: true,               // Set to true for CI
+    retries: 1,
+    headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
-    actionTimeout: 0,             // No limit for actions
-    navigationTimeout: 30000,     // 30 seconds for navigation  
+    actionTimeout: 0,
+    navigationTimeout: 30000,
   },
 
   // Browser Projects

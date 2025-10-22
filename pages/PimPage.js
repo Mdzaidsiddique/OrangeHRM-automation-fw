@@ -1,27 +1,21 @@
-import { expect } from "@playwright/test";
+import { BasePage } from './BasePage.js';
 
-export class PimPage {
-    constructor(page){
-        this.page = page;
-        this.pimText = "//h6[normalize-space()='PIM']";
-        this.addEmployeeButton = "//a[normalize-space()='Add Employee']";
-        this.addEmployeeText = "//h6[normalize-space()='Add Employee']";
-        this.firstNameInputField = "//input[@name='firstName']";
-        this.middleNameInputField = "//input[@name='middleName']";
-        this.lastNameInputField = "//input[@name='lastName']";
-        this.employeeIdInputField = "//label[normalize-space()='Employee Id']/following::input[1]";
-        this.saveButton = "//button[normalize-space()='Save']";
-        this.personalDetailsText = "//h6[normalize-space()='Personal Details']";
-        this.employeeListText = "//a[normalize-space()='Employee List']"
-    };
+export class PimPage extends BasePage {
+  constructor(page) {
+    super(page);
+    this.pimText = "//h6[normalize-space()='PIM']";
+    this.addEmployeeButton = "//a[normalize-space()='Add Employee']";
+    this.addEmployeeText = "//h6[normalize-space()='Add Employee']";
+    this.employeeListText = "//a[normalize-space()='Employee List']";
+  }
 
-    async addEmployeeButtonClick(){
-        await this.page.click(this.addEmployeeButton);
-        await expect(this.page.locator(this.addEmployeeText)).toBeVisible();
-    }
+  async clickOnAddEmployee() {
+    await this.click(this.addEmployeeButton, 'Add Employee Button');
+    await this.verifyVisible(this.addEmployeeText, 'Add Employee Heading');
+  }
 
-    async employeeListButtonClick(){
-        await this.page.click(this.employeeListText);
-        // expect(this.page.locator(this.pimText)).toBeVisible();
-    }
-};
+  async clickOnEmployeeList() {
+    await this.click(this.employeeListText, 'Employee List Button');
+    await this.verifyVisible(this.pimText, 'PIM Text');
+  }
+}

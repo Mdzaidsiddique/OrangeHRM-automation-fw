@@ -1,34 +1,23 @@
-import {test, expect} from '@playwright/test';
-import {LoginPage} from '../pages/LoginPage';
-import {AddEmployeePage} from '../pages/addEmployeePage';
+import { test } from '../fixtures/fixtures.js';
+import { LeftSideNav } from '../pages/LeftSideNav.js';
+import { PimPage } from '../pages/PimPage.js';
+import { AddEmployeePage } from '../pages/AddEmployeePage.js';
 import employeeData from '../test-data/employeeData.json';
-import { LeftSideNav } from '../pages/LeftSideNav';
-import { log } from 'console';
-import { PimPage } from '../pages/PimPage';
-import fs from 'fs';
 
-const ENV = process.env.ENV || 'qa';
-const envData = JSON.parse(fs.readFileSync(`./config/${ENV}.json`));
+test.describe.only('Add Employee Tests', () => {
+  test('@sanity Add a new employee', async ({ loggedInPage }) => {
+    const leftNav = new LeftSideNav(loggedInPage);
+    await leftNav.navigateToOption('PIM');
 
-test.describe("Add Employee tests", ()=>{
-    test.beforeEach("login", async ({page})=>{
-        const loginPage = new LoginPage(page);
-        await loginPage.pagelaunch(envData.baseURL);
-        await loginPage.login(envData.username, envData.password);
-    });
+    const pimPage = new PimPage(loggedInPage);
+    await pimPage.clickOnAddEmployee();
 
-    test("add employee", async ({page})=>{
-        const leftSideNav = new LeftSideNav(page);
-        await leftSideNav.navigateToOption("PIM");
-        const pimPage = new PimPage(page);
-        await pimPage.addEmployeeButtonClick();
-        const addEmployeePage = new AddEmployeePage(page);
-        await addEmployeePage.addEmployee(employeeData.firstName, employeeData.middleName, employeeData.lastName, employeeData.employeeId);
-        log("Employee added successfully");
-    });
-
-    test.afterEach(async ({page})=>{
-        await page.screenshot({path: `screenshots/${Date.now()}_addEmployee.png`});
-        await page.close();
-    });
+    const addEmpPage = new AddEmployeePage(loggedInPage);
+    await addEmpPage.addEmployee(
+      employeeData.firstName,
+      employeeData.middleName,
+      employeeData.lastName,
+      employeeData.employeeId
+    );
+  });
 });
