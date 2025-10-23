@@ -22,21 +22,21 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        echo '📦 Checking out source code...'
+        echo 'Checking out source code...'
         checkout scm
       }
     }
 
     stage('Install Dependencies') {
       steps {
-        echo '📦 Installing npm dependencies...'
+        echo 'Installing npm dependencies...'
         bat 'npm ci'
       }
     }
 
     stage('Install Playwright Browsers') {
       steps {
-        echo '🎯 Installing Playwright browsers...'
+        echo 'Installing Playwright browsers...'
         bat 'npx playwright install --with-deps'
       }
     }
@@ -48,7 +48,7 @@ pipeline {
           def browserValue = params.BROWSER
           def tagsValue = params.TAGS?.trim()
 
-          echo "🎭 Running Playwright tests on '${envValue}' using '${browserValue}' browser..."
+          echo "Running Playwright tests on '${envValue}' using '${browserValue}' browser..."
           
           def tagOption = tagsValue ? "--grep ${tagsValue}" : ""
 
@@ -62,14 +62,14 @@ pipeline {
 
     stage('Generate Allure Report') {
       steps {
-        echo '🧩 Generating Allure report...'
+        echo 'Generating Allure report...'
         bat 'npx allure generate allure-results --clean -o allure-report'
       }
     }
 
     stage('Publish Allure Report') {
       steps {
-        echo '📊 Publishing Allure report in Jenkins...'
+        echo 'Publishing Allure report in Jenkins...'
         allure([
           includeProperties: false,
           jdk: '',
@@ -81,14 +81,14 @@ pipeline {
 
   post {
     always {
-      echo '🧹 Cleaning workspace after build...'
+      echo 'Cleaning workspace after build...'
       cleanWs()
     }
     failure {
-      echo '❌ Build failed. Check Allure report for details.'
+      echo 'Build failed. Check Allure report for details.'
     }
     success {
-      echo '✅ Build and tests completed successfully!'
+      echo 'Build and tests completed successfully!'
     }
   }
 }
