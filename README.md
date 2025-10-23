@@ -5,7 +5,7 @@
 - It follows modern automation principles — **Page Object Model (POM)** architecture, **Fixtures for reusability**, **Allure reporting**, and **Winston-based logging**.  
 - The framework is fully integrated with **Jenkins CI/CD** for automated execution across multiple environments and browsers.
 
-The framework supports:
+### The framework supports:
 - 🔹 Multi-environment testing (`qa`, `staging`, `prod`)
 - 🔹 Multi-browser testing (`Chromium`, `Firefox`, `WebKit`)
 - 🔹 Tag-based test execution
