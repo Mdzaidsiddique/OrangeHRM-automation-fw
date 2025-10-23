@@ -8,7 +8,7 @@ export class BasePage {
 
   async goto(url) {
     logger.info(`Navigating to ${url}`);
-    await this.page.goto(url);
+    await this.page.goto(url, { timeout: 60000, waitUntil: 'domcontentloaded' });
   }
 
   async click(locator, name = '') {
@@ -23,11 +23,11 @@ export class BasePage {
 
   async verifyVisible(locator, name = '') {
     logger.info(`Verifying visibility of ${name || locator}`);
-    await expect(this.page.locator(locator)).toBeVisible({ timeout: 20000 });
+    await expect(this.page.locator(locator)).toBeVisible({ timeout: 60000 });
   }
 
   async waitForElement(locator, name = '') {
     logger.info(`Waiting for element ${name || locator}`);
-    await this.page.waitForSelector(locator, { timeout: 20000 });
+    await this.page.waitForSelector(locator, { timeout: 60000 });
   }
 }

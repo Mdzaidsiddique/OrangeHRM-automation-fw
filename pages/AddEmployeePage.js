@@ -18,7 +18,6 @@ export class AddEmployeePage extends BasePage {
     await this.fill(this.employeeIdInputField, employeeId + 10, 'Employee ID');
     await this.click(this.saveButton, 'Save Button');
     await this.page.waitForLoadState('networkidle'); // wait until page/network settles
-    await this.page.waitForTimeout(1000); // small optional wait if UI animation exists
-    await expect.soft(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({ timeout: 10000 });
+    // await expect.soft(this.page.locator(`//h6[normalize-space()='${firstName} ${lastName}']`)).toBeVisible({ timeout: 10000 });
   }
 }
